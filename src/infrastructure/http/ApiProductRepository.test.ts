@@ -5,7 +5,7 @@ describe("ApiProductRepository", () => {
 
   beforeEach(() => {
     repository = new ApiProductRepository();
-    // @ts-ignore
+
     global.fetch = jest.fn();
   });
 

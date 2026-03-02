@@ -7,7 +7,7 @@ describe("ApiPaymentGateway", () => {
 
   beforeEach(() => {
     gateway = new ApiPaymentGateway();
-    // @ts-ignore
+
     global.fetch = jest.fn();
   });
 

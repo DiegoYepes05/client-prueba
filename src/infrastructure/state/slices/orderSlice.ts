@@ -33,10 +33,10 @@ const loadPersistedState = (): Partial<OrderState> => {
 
 const savePersistedState = (state: OrderState) => {
   try {
-    const { product, order, cardInfo, acceptedTerms, acceptedData } = state;
+    const { product, order, acceptedTerms, acceptedData } = state;
     localStorage.setItem(
       PERSISTENCE_KEY,
-      JSON.stringify({ product, order, cardInfo, acceptedTerms, acceptedData }),
+      JSON.stringify({ product, order, acceptedTerms, acceptedData }),
     );
   } catch (e) {
     console.error("Error persisting state", e);
@@ -133,7 +133,7 @@ const orderSlice = createSlice({
     },
     setShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
       if (!state.order && state.product) {
-        // Inicializar order basico si no existe
+
         state.order = {
           product: state.product,
           quantity: 1,

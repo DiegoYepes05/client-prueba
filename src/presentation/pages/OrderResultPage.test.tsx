@@ -61,8 +61,8 @@ describe("OrderResultPage", () => {
     const finishButton = screen.getByText(/Seguir comprando/i);
     fireEvent.click(finishButton);
 
-    // No podemos probar fácilmente la navegación de MemoryRouter sin un hook,
-    // pero podemos probar que el estado se reseteó
+
+
     const state = store.getState();
     expect(state.order.transaction).toBeNull();
   });

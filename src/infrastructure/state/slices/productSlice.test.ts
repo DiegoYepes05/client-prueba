@@ -82,7 +82,7 @@ describe("productSlice", () => {
     expect(state.error).toBe("No encontrado");
   });
 
-  // Reducer tests for individual actions
+
   test("debe manejar fetchProducts.pending", () => {
     const action = { type: fetchProducts.pending.type };
     const nextState = productReducer(initialState, action);
