@@ -3,7 +3,7 @@ import TransactionProgressPage from "./TransactionProgressPage";
 import { renderWithProviders } from "@/test-utils";
 import { processPaymentUseCase } from "../../infrastructure/di/container";
 
-// Mock de los casos de uso en el contenedor DI
+
 jest.mock("../../infrastructure/di/container", () => ({
   processPaymentUseCase: {
     tokenizeCard: jest.fn(),
@@ -65,12 +65,12 @@ describe("TransactionProgressPage", () => {
 
     expect(screen.getByText(/Procesando tu pago/i)).toBeInTheDocument();
 
-    // Avanzar el tiempo
+
     await act(async () => {
       jest.advanceTimersByTime(2000);
     });
 
-    // Esperar a que se llamen los mocks
+
     await waitFor(() => {
       expect(processPaymentUseCase.tokenizeCard).toHaveBeenCalled();
     });
@@ -99,7 +99,7 @@ describe("TransactionProgressPage", () => {
       });
     });
 
-    // Avanzar el tiempo
+
     await act(async () => {
       jest.advanceTimersByTime(2000);
     });

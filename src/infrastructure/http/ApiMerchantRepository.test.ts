@@ -5,7 +5,7 @@ describe("ApiMerchantRepository", () => {
 
   beforeEach(() => {
     repository = new ApiMerchantRepository();
-    // @ts-ignore
+
     global.fetch = jest.fn();
   });
 

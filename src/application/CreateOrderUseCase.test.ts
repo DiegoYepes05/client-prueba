@@ -31,11 +31,11 @@ describe("CreateOrderUseCase", () => {
     const quantity = 2;
     const result = useCase.execute(mockProduct, quantity, mockShippingInfo);
 
-    const expectedSubtotal = mockProduct.price * quantity; // 700,000
+    const expectedSubtotal = mockProduct.price * quantity;
     const expectedBaseFee = 15000;
     const expectedShippingFee = 10000;
     const expectedTotal =
-      expectedSubtotal + expectedBaseFee + expectedShippingFee; // 725,000
+      expectedSubtotal + expectedBaseFee + expectedShippingFee;
 
     expect(result.subtotal).toBe(expectedSubtotal);
     expect(result.baseFee).toBe(expectedBaseFee);
