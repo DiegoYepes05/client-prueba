@@ -2,7 +2,9 @@ import { Order } from "../../domain/entities/Order";
 import { CardInfo, Transaction } from "../../domain/entities/Transaction";
 import { PaymentGateway } from "../../domain/ports/PaymentGateway";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+import { getApiUrl } from "./config";
+
+const API_URL = getApiUrl();
 
 export class ApiPaymentGateway implements PaymentGateway {
   async tokenizeCard(cardInfo: CardInfo): Promise<string> {

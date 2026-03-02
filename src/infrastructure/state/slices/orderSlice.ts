@@ -212,6 +212,17 @@ const orderSlice = createSlice({
       .addCase(fetchMerchant.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(tokenizeCard.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(tokenizeCard.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(tokenizeCard.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
