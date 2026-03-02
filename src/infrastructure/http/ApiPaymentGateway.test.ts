@@ -33,6 +33,7 @@ describe("ApiPaymentGateway", () => {
       email: "juan@example.com",
       address: "Calle 1",
       city: "Bogota",
+      department: "Cundinamarca",
       country: "CO",
       phone: "3001234567",
     },
@@ -130,12 +131,37 @@ describe("ApiPaymentGateway", () => {
     ).rejects.toThrow("Error al procesar el pago");
   });
 
-  test("debe obtener el estado de la transacción correctamente", async () => {
+  test("debe obtener el detalle de la transacción correctamente", async () => {
     const mockTx = {
-      id: "tx-123",
-      status: "APPROVED",
-      amount: 25100,
-      createdAt: "2024-03-01T12:00:00Z",
+      data: {
+        id: "tx-123",
+        created_at: "2024-03-01T12:00:00Z",
+        finalized_at: "2024-03-01T12:05:00Z",
+        amount_in_cents: 2510000,
+        reference: "REF-123",
+        currency: "COP",
+        payment_method_type: "CARD",
+        payment_method: {
+          type: "CARD",
+          extra: {
+            brand: "VISA",
+            last_four: "4242",
+            processor_response_code: "00",
+          },
+          installments: 1,
+        },
+        status: "APPROVED",
+        merchant: {
+          id: 1,
+          name: "Test Merchant",
+          legal_name: "Test Legal",
+          contact_name: "Test Contact",
+          phone_number: "123",
+          email: "test@test.com",
+          legal_id: "123",
+          legal_id_type: "CC",
+        },
+      },
     };
 
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -143,19 +169,20 @@ describe("ApiPaymentGateway", () => {
       json: async () => mockTx,
     });
 
-    const result = await gateway.getTransactionStatus("tx-123");
+    const result = await gateway.getTransactionDetail("tx-123");
 
     expect(result.status).toBe("APPROVED");
-    expect(result.createdAt).toBeInstanceOf(Date);
+    expect(result.createdAt).toBeDefined();
+    expect(result.merchant.name).toBe("Test Merchant");
   });
 
-  test("debe lanzar error si falla getTransactionStatus", async () => {
+  test("debe lanzar error si falla getTransactionDetail", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
     });
 
-    await expect(gateway.getTransactionStatus("tx-123")).rejects.toThrow(
-      "No se pudo obtener el estado de la transacción",
+    await expect(gateway.getTransactionDetail("tx-123")).rejects.toThrow(
+      "No se pudo obtener el detalle de la transacción",
     );
   });
 });

@@ -22,39 +22,35 @@ interface OrderState {
 
 const PERSISTENCE_KEY = "wompi_checkout_flow";
 
-const loadPersistedState = (): Partial<OrderState> => {
+const getSavedState = (): Partial<OrderState> => {
   try {
-    const data = localStorage.getItem(PERSISTENCE_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch {
+    const saved = localStorage.getItem(PERSISTENCE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch (e) {
+    console.error("Error loading state from localStorage", e);
     return {};
   }
 };
 
-const savePersistedState = (state: OrderState) => {
+const persistState = (state: Partial<OrderState>) => {
   try {
-    const { product, order, acceptedTerms, acceptedData } = state;
-    localStorage.setItem(
-      PERSISTENCE_KEY,
-      JSON.stringify({ product, order, acceptedTerms, acceptedData }),
-    );
+    localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
   } catch (e) {
-    console.error("Error persisting state", e);
+    console.error("Error saving state to localStorage", e);
   }
 };
 
-const persisted = loadPersistedState();
-
 const initialState: OrderState = {
-  product: persisted.product ?? null,
-  order: persisted.order ?? null,
-  cardInfo: persisted.cardInfo ?? null,
+  product: null,
+  order: null,
+  cardInfo: null,
   transaction: null,
   merchant: null,
-  acceptedTerms: persisted.acceptedTerms ?? false,
-  acceptedData: persisted.acceptedData ?? false,
+  acceptedTerms: false,
+  acceptedData: false,
   loading: false,
   error: null,
+  ...getSavedState(),
 };
 
 export const createOrder = createAsyncThunk(
@@ -125,15 +121,13 @@ const orderSlice = createSlice({
   reducers: {
     setProduct: (state, action: PayloadAction<Product>) => {
       state.product = action.payload;
-      savePersistedState(state);
+      persistState({ product: action.payload });
     },
     setCardInfo: (state, action: PayloadAction<CardInfo>) => {
       state.cardInfo = action.payload;
-      savePersistedState(state);
     },
     setShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
       if (!state.order && state.product) {
-
         state.order = {
           product: state.product,
           quantity: 1,
@@ -146,7 +140,6 @@ const orderSlice = createSlice({
       } else if (state.order) {
         state.order.shippingInfo = action.payload;
       }
-      savePersistedState(state);
     },
     setAcceptance: (
       state,
@@ -154,7 +147,6 @@ const orderSlice = createSlice({
     ) => {
       state.acceptedTerms = action.payload.terms;
       state.acceptedData = action.payload.data;
-      savePersistedState(state);
     },
     resetOrderFlow: (state) => {
       state.product = null;
@@ -168,6 +160,7 @@ const orderSlice = createSlice({
       localStorage.removeItem(PERSISTENCE_KEY);
     },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(createOrder.pending, (state) => {
@@ -177,7 +170,6 @@ const orderSlice = createSlice({
       .addCase(createOrder.fulfilled, (state, action: PayloadAction<Order>) => {
         state.loading = false;
         state.order = action.payload;
-        savePersistedState(state);
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;

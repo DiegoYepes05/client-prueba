@@ -34,6 +34,7 @@ export default function ShippingPaymentPage() {
       email: "",
       address: "",
       city: "",
+      department: "",
       country: "Colombia",
       phone: "",
     },
@@ -164,6 +165,21 @@ export default function ShippingPaymentPage() {
                     />
                     {errors.city && (
                       <p className="text-xs text-red-500">{errors.city}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="department">Departamento</Label>
+                    <Input
+                      id="department"
+                      placeholder="Cundinamarca"
+                      value={form.department}
+                      onChange={handleChange("department")}
+                      className={errors.department ? "border-red-500" : ""}
+                    />
+                    {errors.department && (
+                      <p className="text-xs text-red-500">
+                        {errors.department}
+                      </p>
                     )}
                   </div>
                   <div className="space-y-2">

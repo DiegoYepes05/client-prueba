@@ -6,6 +6,8 @@ import CreditCardFormPage from "../pages/CreditCardFormPage";
 import PaymentSummaryPage from "../pages/PaymentSummaryPage";
 import TransactionProgressPage from "../pages/TransactionProgressPage";
 import OrderResultPage from "../pages/OrderResultPage";
+import PaymentsHistoryPage from "../pages/PaymentsHistoryPage";
+import TransactionDetailPage from "../pages/TransactionDetailPage";
 
 export function AppRouter() {
   return (
@@ -18,6 +20,8 @@ export function AppRouter() {
         <Route path="/summary" element={<PaymentSummaryPage />} />
         <Route path="/processing" element={<TransactionProgressPage />} />
         <Route path="/result" element={<OrderResultPage />} />
+        <Route path="/transactions" element={<PaymentsHistoryPage />} />
+        <Route path="/transactions/:id" element={<TransactionDetailPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
