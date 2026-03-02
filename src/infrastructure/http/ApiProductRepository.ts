@@ -1,7 +1,9 @@
 import { Product } from "../../domain/entities/Product";
 import { ProductRepository } from "../../domain/ports/ProductRepository";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+import { getApiUrl } from "./config";
+
+const API_URL = getApiUrl();
 
 export class ApiProductRepository implements ProductRepository {
   async getById(id: string): Promise<Product> {

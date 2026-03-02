@@ -20,7 +20,6 @@ export default function TransactionProgressPage() {
   const flowStarted = useRef(false);
 
   useEffect(() => {
-
     if (!order || !cardInfo || !merchant) {
       console.log("Missing data:", { order, cardInfo, merchant });
       return;
@@ -49,7 +48,9 @@ export default function TransactionProgressPage() {
         }
       } catch (err: any) {
         console.error("Payment flow error:", err);
-        setInternalError(err.message || "Error desconocido");
+        setInternalError(
+          err.message || (typeof err === "string" ? err : "Error desconocido"),
+        );
       }
     };
 

@@ -1,7 +1,9 @@
 import { Merchant } from "../../domain/entities/Merchant";
 import { MerchantRepository } from "../../domain/ports/MerchantRepository";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+import { getApiUrl } from "./config";
+
+const API_URL = getApiUrl();
 
 export class ApiMerchantRepository implements MerchantRepository {
   async getMerchantInfo(): Promise<Merchant> {

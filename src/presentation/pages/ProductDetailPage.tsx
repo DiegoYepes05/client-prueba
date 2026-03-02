@@ -31,6 +31,17 @@ export default function ProductDetailPage() {
     );
   }
 
+  if (!product && !loading) {
+    return (
+      <CheckoutLayout currentStep={0} backTo="/" title="Error">
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-bold mb-4">Producto no encontrado</h2>
+          <Button onClick={() => navigate("/")}>Volver a la selección</Button>
+        </div>
+      </CheckoutLayout>
+    );
+  }
+
   if (!product) return null;
 
   return (
@@ -49,8 +60,20 @@ export default function ProductDetailPage() {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute top-4 left-4 bg-black text-white text-xs font-bold px-3 py-1.5 rounded-full">
-            EN STOCK
+          <div className="absolute top-4 left-4 flex gap-2">
+            <div className="bg-black text-white text-xs font-bold px-3 py-1.5 rounded-full">
+              EN STOCK
+            </div>
+            {product.stock <= 5 && product.stock > 0 && (
+              <div className="bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
+                ¡ÚLTIMAS {product.stock}!
+              </div>
+            )}
+            {product.stock === 0 && (
+              <div className="bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                AGOTADO
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-6">
@@ -74,11 +97,18 @@ export default function ProductDetailPage() {
 
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <span className="w-2 h-2 rounded-full bg-black inline-block" />
-            {product.stock} unidades disponibles
+            {product.stock === 0
+              ? "Sin unidades disponibles"
+              : `${product.stock} unidades disponibles`}
           </div>
 
-          <Button fullWidth onClick={handleBuy} className="text-base py-4">
-            Comprar ahora
+          <Button
+            fullWidth
+            onClick={handleBuy}
+            className="text-base py-4"
+            disabled={product.stock === 0}
+          >
+            {product.stock === 0 ? "Agotado" : "Comprar ahora"}
           </Button>
         </div>
       </div>
