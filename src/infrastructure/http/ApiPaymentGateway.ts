@@ -1,5 +1,10 @@
 import { Order } from "../../domain/entities/Order";
-import { CardInfo, Transaction } from "../../domain/entities/Transaction";
+import {
+  CardInfo,
+  Transaction,
+  PaymentStatus,
+  TransactionDetail,
+} from "../../domain/entities/Transaction";
 import { PaymentGateway } from "../../domain/ports/PaymentGateway";
 
 import { getApiUrl } from "./config";
@@ -54,6 +59,11 @@ export class ApiPaymentGateway implements PaymentGateway {
           legal_id: "12345678",
           legal_id_type: "CC",
         },
+        shipping_info: {
+          address: order.shippingInfo.address,
+          city: order.shippingInfo.city,
+          department: order.shippingInfo.department || "N/A",
+        },
       }),
     });
 
@@ -81,11 +91,56 @@ export class ApiPaymentGateway implements PaymentGateway {
     };
   }
 
-  async getTransactionStatus(transactionId: string): Promise<Transaction> {
+  async getTransactionDetail(
+    transactionId: string,
+  ): Promise<TransactionDetail> {
     const res = await fetch(`${API_URL}/payment/transaction/${transactionId}`);
     if (!res.ok)
-      throw new Error("No se pudo obtener el estado de la transacción");
-    const data = await res.json();
-    return { ...data, createdAt: new Date(data.createdAt) };
+      throw new Error("No se pudo obtener el detalle de la transacción");
+    const response = await res.json();
+    const d = response.data;
+
+    return {
+      id: d.id,
+      createdAt: d.created_at,
+      finalizedAt: d.finalized_at,
+      amountInCents: d.amount_in_cents,
+      reference: d.reference,
+      currency: d.currency,
+      paymentMethodType: d.payment_method_type,
+      paymentMethod: {
+        type: d.payment_method.type,
+        extra: d.payment_method.extra
+          ? {
+              name: d.payment_method.extra.name,
+              brand: d.payment_method.extra.brand,
+              cardType: d.payment_method.extra.card_type,
+              lastFour: d.payment_method.extra.last_four,
+              processorResponseCode:
+                d.payment_method.extra.processor_response_code,
+            }
+          : undefined,
+        installments: d.payment_method.installments,
+      },
+      status: d.status,
+      statusMessage: d.status_message,
+      merchant: {
+        id: d.merchant.id,
+        name: d.merchant.name,
+        legalName: d.merchant.legal_name,
+        contactName: d.merchant.contact_name,
+        phoneNumber: d.merchant.phone_number,
+        logoUrl: d.merchant.logo_url,
+        email: d.merchant.email,
+        legalId: d.merchant.legal_id,
+        legalIdType: d.merchant.legal_id_type,
+      },
+    };
+  }
+
+  async getPaymentsStatus(): Promise<any[]> {
+    const res = await fetch(`${API_URL}/payment/payments-status`);
+    if (!res.ok) throw new Error("No se pudieron obtener las transacciones");
+    return await res.json();
   }
 }

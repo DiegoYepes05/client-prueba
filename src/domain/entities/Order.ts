@@ -5,6 +5,7 @@ export interface ShippingInfo {
   email: string;
   address: string;
   city: string;
+  department: string;
   country: string;
   phone: string;
 }
