@@ -1,73 +1,108 @@
-# React + TypeScript + Vite
+# Prueba Técnica - Tienda con Wompi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Demo
 
-Currently, two official plugins are available:
+- Frontend: https://main.d3ojpcu7nr3230.amplifyapp.com/
+- Backend: http://54.81.5.152:3000
+- Swagger: http://54.81.5.152:3000/api/docs
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack
 
-## React Compiler
+- Frontend: React + Redux Toolkit + Tailwind
+- Backend: NestJS + Prisma + PostgreSQL
+- Infraestructura: Docker + AWS (S3, RDS, ECS, ECR, Amplify)
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## Instalación local
 
-## Expanding the ESLint configuration
+### Backend
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Entrar a la carpeta: `cd server-prueba`
+2. Copiar variables: `cp .env.example .env`
+3. Iniciar con Docker: `docker compose up --build`
+4. Poblar base de datos (Opcional): `curl -X POST http://localhost:3000/api/product/seed`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Frontend
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. Entrar a la carpeta: `cd client-prueba`
+2. Instalar dependencias: `npm install`
+3. Iniciar: `npm run dev`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Modelo de datos
+
+El sistema gestiona la persistencia mediante Prisma con las siguientes relaciones:
+
+```mermaid
+erDiagram
+    USER ||--o{ TRANSACTION : "realiza"
+    USER ||--o{ DELIVERY : "recibe"
+    PRODUCT ||--o{ TRANSACTION : "se vende en"
+    TRANSACTION ||--|| DELIVERY : "genera"
+
+    USER {
+        string id PK
+        string email UK
+        string name
+    }
+    PRODUCT {
+        string id PK
+        string name
+        float price
+        int stock
+    }
+    TRANSACTION {
+        string id PK
+        string reference UK
+        string status
+        int amountInCents
+    }
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Pruebas unitarias
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Cobertura superior al 85% en los flujos críticos de negocio.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Frontend
+
+```text
+-------------------|---------|----------|---------|---------
+Métrica            | % Stmts | % Branch | % Funcs | % Lines
+-------------------|---------|----------|---------|---------
+Total              |   93.58 |    85.04 |   89.82 |   94.58
+-------------------|---------|----------|---------|---------
 ```
+
+### Backend
+
+```text
+------------------------------------|---------|----------|---------|---------|
+File                                | % Stmts | % Branch | % Funcs | % Lines |
+------------------------------------|---------|----------|---------|---------|
+All files                           |   92.41 |    82.14 |   88.23 |   90.52 |
+ payment/application                |     100 |      100 |     100 |     100 |
+ payment/infrastructure/persistence |     100 |    63.63 |     100 |     100 |
+ product/domain                     |     100 |      100 |     100 |     100 |
+ product/infrastructure/persistence |   93.33 |      100 |      90 |      92 |
+------------------------------------|---------|----------|---------|---------|
+```
+
+Para ejecutar localmente:
+
+- Frontend: `cd client-prueba && npm run test:coverage`
+- Backend: `cd server-prueba && npm run test:cov`
+
+## Arquitectura
+
+Se utiliza Arquitectura Hexagonal para desacoplar la lógica de negocio de los agentes externos:
+
+- **Dominio:** Entidades y contratos (interfaces).
+- **Aplicación:** Casos de uso y lógica de servicios.
+- **Infraestructura:** Adaptadores para Prisma, Wompi, AWS S3 y controladores de entrada.
+- **Presentación:** Interfaz de usuario y componentes React.
+
+## Variables de entorno
+
+- `PORT`: Puerto de la aplicación.
+- `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET_NAME`: Credenciales y bucket S3.
+- `BASE_URL`, `PUBLIC_KEY`, `PRIVATE_KEY`, `INTEGRITY_SECRET`: Credenciales de Wompi.
+- `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`: Configuración de PostgreSQL.
+- `DATABASE_URL`: URL de conexión completa para Prisma.
